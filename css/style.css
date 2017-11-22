@@ -1,0 +1,127 @@
+#hello {
+	color: red;
+}
+.header-row
+{
+	display: inline-block;
+	width: 100%;
+}
+.header-value
+{
+	width: 150px;
+	float: left;
+	text-align: center;
+	background-color: #D3D3D3;
+	margin: 30px;
+	position: relative;
+}
+
+.kpi-header
+{
+	width: 100%;
+	font-size: 20px;
+	margin-top: 20px;
+	margin-bottom:10px;
+	text-align: center;}
+
+.kpi-value
+{
+	width: 100%;
+	font-size: 30px;
+	text-align: center;}
+
+.kpi-unit
+{
+	width: 100%;
+	font-size: 20px;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+
+.timeline
+{
+	display: table;
+	padding: 20px;
+	padding-top: 50px;
+}
+
+.timeline-row,
+.timeline-header
+{
+	display: table-row;
+	height: 30px;
+}
+
+.timeline-row .month,
+.timeline-header .month
+{
+	display: table-cell;
+	text-align: center;
+	width:50px;
+}
+
+.timeline-row .\32
+{
+	background-color: #cca99b;
+}
+
+.timeline-row .name,
+.timeline-header .name
+{
+	display: table-cell;
+	width:100px;
+}
+
+.transactions
+{
+	display: table;
+	padding: 20px;
+	padding-top: 50px;
+}
+
+.transactions-row,
+.transactions-header
+{
+	display: table-row;
+	height: 30px;
+}
+
+.transactions-row .date,
+.transactions-header .date
+{
+	display: table-cell;
+	width:50px;
+}
+.transactions-row .type,
+.transactions-header .type
+{
+	display: table-cell;
+	width:100px;
+}
+.transactions-row .value,
+.transactions-header .value
+{
+	display: table-cell;
+	text-align: center;
+	width:100px;
+}
+.transactions-row .member,
+.transactions-header .member
+{
+	display: table-cell;
+	width:100px;
+}
+.transactions-row .note,
+.transactions-header .note
+{
+	display: table-cell;
+	width:100px;
+}
+
+.additem
+{
+	cursor: pointer;
+}
+

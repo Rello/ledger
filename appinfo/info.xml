@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>ledger</id>
+    <name>Ledger</name>
+    <summary>Ledger</summary>
+    <description><![CDATA[Ledger]]></description>
+    <licence>agpl</licence>
+    <author mail="ledger@scherello.de" >Marcel Scherello</author>
+    <version>0.0.2</version>
+    <namespace>Ledger</namespace>
+    <category>tools</category>
+    <bugs>https://github.com/Rello/audioplayer/issues</bugs>
+    <dependencies>
+        <nextcloud min-version="12" max-version="12"/>
+        <owncloud min-version="9.1" max-version="10.0"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Ledger</name>
+            <route>ledger.page.index</route>
+        </navigation>
+    </navigations>
+</info>
