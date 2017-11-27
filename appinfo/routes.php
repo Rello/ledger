@@ -11,11 +11,15 @@ return [
     'routes' => [
 	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
-        ['name' => 'db#getTotals', 'url' => '/gettotals', 'verb' => 'POST'],
-        ['name' => 'db#getTimeline', 'url' => '/gettimeline', 'verb' => 'POST'],
-        ['name' => 'db#getTransactions', 'url' => '/gettransactions', 'verb' => 'POST'],
-        ['name' => 'db#addTimeline', 'url' => '/addtimeline', 'verb' => 'POST'],
-        ['name' => 'db#addMember', 'url' => '/addmember', 'verb' => 'POST'],
-        ['name' => 'db#editMember', 'url' => '/editMember', 'verb' => 'POST'],
+        ['name' => 'ledger#getTotals', 'url' => '/gettotals', 'verb' => 'POST'],
+        ['name' => 'ledger#getTransactions', 'url' => '/gettransactions', 'verb' => 'POST'],
+        ['name' => 'ledger#addMember', 'url' => '/addmember', 'verb' => 'POST'],
+        ['name' => 'ledger#editMember', 'url' => '/editmember', 'verb' => 'POST'],
+        ['name' => 'ledger#deleteMember', 'url' => '/deletemember', 'verb' => 'POST'],
+        ['name' => 'timeline#editTimeline', 'url' => '/edittimeline', 'verb' => 'POST'],
+        ['name' => 'timeline#deleteTimeline', 'url' => '/deletetimeline', 'verb' => 'POST'],
+        ['name' => 'timeline#getTimeline', 'url' => '/gettimeline', 'verb' => 'POST'],
+        ['name' => 'timeline#addTimeline', 'url' => '/addtimeline', 'verb' => 'POST'],
+        ['name' => 'ledger#addTransaction', 'url' => '/addtransaction', 'verb' => 'POST'],
     ]
 ];

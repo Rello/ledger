@@ -16,6 +16,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\IL10N;
 use OCP\IDbConnection;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Controller class for main page.
@@ -36,46 +37,28 @@ class DbController extends Controller {
 		$this->db = $db;
 		}
 
-	/**
-	 * @NoAdminRequired
-	 * 
-	 */
-	public function getTotals($group_id){
-		$totals= $this->getTotalsforGroup($group_id);
-	
-		if($totals){
-			$result=[
-				'status' => 'success',
-				'data' => $totals
-			];
-		}else{
-			$result=[
-				'status' => 'nodata'
-			];
-		}
-		$response = new JSONResponse();
-		$response -> setData($result);
-		return $response;
-	}
 
     /**
-     * Get the categories items for a user
+     * Get the totals for a group
      *
      * @param string $group_id
      * @return array
      */
-	private function getTotalsforGroup($group_id){
+    public function getTotalsforGroup($group_id){
 		$totals=array();
-        $SQL="SELECT SUM(`value`) AS `value`
+        //Einnahmen
+		$SQL="SELECT SUM(`value`) AS `value`
 						FROM `*PREFIX*ledger_booking`
 			 			WHERE  `group_id` = ?
-			 			AND `valuetype` = '1'
+			 			AND (`valuetype` = '1'
+			 			OR `valuetype` = '3')
 			 			";
         $stmt = $this->db->prepare($SQL);
         $stmt->execute(array($group_id));
         $results = $stmt->fetch();
-        $totals['kpi2'] = $results['value'];
+        $totals['kpi2'] = 0 + $results['value'];
 
+        //Ausgaben
         $SQL="SELECT SUM(`value`) AS `value`
 						FROM `*PREFIX*ledger_booking`
 			 			WHERE  `group_id` = ?
@@ -84,42 +67,19 @@ class DbController extends Controller {
         $stmt = $this->db->prepare($SQL);
         $stmt->execute(array($group_id));
         $results = $stmt->fetch();
-        $totals['kpi3'] = $results['value'];
+        $totals['kpi3'] = 0 + $results['value'];
 
         $totals['kpi1']=$totals['kpi2'] - $totals['kpi3'];
         return $totals;
     }
 
     /**
-     * @NoAdminRequired
-     *
-     */
-    public function getTimeline($group_id){
-        $totals= $this->getTimelineItems($group_id);
-        $members = $this->getMembersOfGroup($group_id);
-
-        if(is_array($members)){
-            $result=[
-                'status' => 'success',
-                'data' => ['members'=>$members,'timeline'=>$totals]
-            ];
-        }else{
-            $result=[
-                'status' => 'nodata'
-            ];
-        }
-        $response = new JSONResponse();
-        $response -> setData($result);
-        return $response;
-    }
-
-    /**
-     * Get the categories items for a user
+     * Get the members of a group
      *
      * @param string $group_id
      * @return array
      */
-    private function getMembersOfGroup($group_id){
+    public function getMembersOfGroup($group_id){
         $timeline_row = array();
         $SQL="SELECT *
                 FROM `*PREFIX*ledger_member`
@@ -132,12 +92,12 @@ class DbController extends Controller {
     }
 
     /**
-     * Get the categories items for a user
+     * Get the timeline items for a group
      *
      * @param string $group_id
      * @return array
      */
-    private function getTimelineItems($group_id){
+    public function getTimelineItems($group_id){
         $timeline_row = array();
         $SQL="SELECT `id`, `name`
                 FROM `*PREFIX*ledger_member`
@@ -154,17 +114,19 @@ class DbController extends Controller {
     }
 
     /**
-     * Get the categories items for a user
+     * Get the timeline columns
      *
      * @param string $group_id
+     * @param string $member_id
      * @return array
      */
-    private function getTimelineColumns($group_id, $member_id){
-        $SQL="SELECT `month`, `version`
+    public function getTimelineColumns($group_id, $member_id){
+        $SQL="SELECT `id`, `month`, `version`
             FROM `oc_ledger_booking`
             WHERE  `group_id` = ?
             AND `member_id` = ?
             AND `valuetype` = 3
+            ORDER BY `month` ASC
 			";
         $stmt = $this->db->prepare($SQL);
         $stmt->execute(array($group_id, $member_id));
@@ -173,36 +135,14 @@ class DbController extends Controller {
     }
 
     /**
-     * @NoAdminRequired
-     *
-     */
-    public function getTransactions($group_id){
-        $totals= $this->getTransactionItems($group_id);
-
-        if($totals){
-            $result=[
-                'status' => 'success',
-                'data' => $totals
-            ];
-        }else{
-            $result=[
-                'status' => 'nodata'
-            ];
-        }
-        $response = new JSONResponse();
-        $response -> setData($result);
-        return $response;
-    }
-
-    /**
-     * Get the categories items for a user
+     * Get the transactions for a group
      *
      * @param string $group_id
      * @return array
      */
-    private function getTransactionItems($group_id){
+    public function getTransactionItems($group_id){
         $timeline_row = array();
-        $SQL="SELECT `date`, `V`.`name` AS `type`, `M`.`name` AS `member`,`value`, `note`
+        $SQL="SELECT `date`, `V`.`name` AS `type`, `M`.`name` AS `member`,`value`, `month`, `note`
             FROM `*PREFIX*ledger_booking` `B`
             LEFT JOIN `*PREFIX*ledger_valuetype` `V`
             ON `B`.`valuetype` = `V`.`id`
@@ -226,7 +166,7 @@ class DbController extends Controller {
      * @param array $booking
      * @return integer
      */
-    private function addBookingDB($booking){
+    public function addBooking($booking){
         $stmt = $this->db->prepare('INSERT INTO `*PREFIX*ledger_booking` (`member_id`,`group_id`,`valuetype`,`value`,`month`,`date`,`version`,`note`) VALUES(?,?,?,?,?,?,?,?)');
         $stmt->execute(array(
             $booking['member_id'],
@@ -243,46 +183,12 @@ class DbController extends Controller {
     }
 
     /**
-     * @NoAdminRequired
-     *
-     */
-    public function addTimeline($member_id, $month){
-
-        $group_id = $this->getGroupByMember($member_id);
-        $default = $this->getGroupDefault($group_id);
-
-        $booking['member_id'] = $member_id;
-        $booking['group_id'] = $group_id;
-        $booking['valuetype'] = 3;
-        $booking['value'] = $default;
-        $booking['month'] = $month +1;
-        $booking['date'] = '';
-        $booking['version'] = 1;
-        $booking['note'] ='';
-        $totals = $this->addBookingDB($booking);
-
-        if($totals){
-            $result=[
-                'status' => 'success',
-                'data' => $totals
-            ];
-        }else{
-            $result=[
-                'status' => 'nodata'
-            ];
-        }
-        $response = new JSONResponse();
-        $response -> setData($result);
-        return $response;
-    }
-
-    /**
      * Get group id by member id
      *
      * @param integer $member_id
      * @return integer
      */
-    private function getGroupByMember($member_id){
+    public function getGroupByMember($member_id){
         $SQL="SELECT `group_id`
 			  FROM `*PREFIX*ledger_member`
 			  WHERE  `id` = ?
@@ -299,7 +205,7 @@ class DbController extends Controller {
      * @param integer $group_id
      * @return integer
      */
-    private function getGroupDefault($group_id){
+    public function getGroupDefault($group_id){
         $SQL="SELECT `default`
 			  FROM `*PREFIX*ledger_group`
 			  WHERE  `id` = ?
@@ -311,38 +217,12 @@ class DbController extends Controller {
     }
 
     /**
-     * @NoAdminRequired
+     * add a member entry
      *
-     */
-    public function addMember($group_id){
-
-        $member['name'] = 'Neu';
-        $member['group_id'] = $group_id;
-
-        $return = $this->addMemberDB($member);
-
-        if($return){
-            $result=[
-                'status' => 'success',
-                'data' => $return
-            ];
-        }else{
-            $result=[
-                'status' => 'nodata'
-            ];
-        }
-        $response = new JSONResponse();
-        $response -> setData($result);
-        return $response;
-    }
-
-    /**
-     * write a member entry
-     *
-     * @param array $member
+     * @param array $item
      * @return integer
      */
-    private function addMemberDB($item){
+    public function addMember($item){
         $stmt = $this->db->prepare('INSERT INTO `*PREFIX*ledger_member` (`user_id`,`name`,`group_id`) VALUES(?,?,?)');
         $stmt->execute(array(
             $item['user_id'],
@@ -351,6 +231,70 @@ class DbController extends Controller {
         ));
         $insertid = $this->db->lastInsertId('*PREFIX*ledger_member');
         return $insertid;
+    }
+
+    /**
+     * edit a member entry
+     *
+     * @param Integer $id
+     * @param Integer $user_id
+     * @param Integer $name
+     * @return integer
+     */
+    public function editMember($id, $user_id, $name){
+        $stmt = $this->db->prepare('UPDATE `*PREFIX*ledger_member` SET `user_id` = ? ,`name` = ? WHERE `id` = ?');
+        $stmt->execute(array(
+            $user_id,
+            $name,
+            $id,
+        ));
+        return true;
+    }
+
+    /**
+     * delete a member entry
+     *
+     * @param Integer $id
+     * @return boolean
+     */
+    public function deleteMember($id){
+        $stmt = $this->db->prepare('delete from `*PREFIX*ledger_member` WHERE `id` = ?');
+        $stmt->execute(array(
+            $id,
+        ));
+        return true;
+    }
+
+    /**
+     * edit a timeline entry
+     *
+     * @param Integer $id
+     * @param Integer $month
+     * @param Integer $version
+     * @return boolean
+     */
+    public function editTimeline($id, $month, $version){
+        $stmt = $this->db->prepare('UPDATE `*PREFIX*ledger_booking` SET `month` = ? ,`version` = ? WHERE `id` = ?');
+        $stmt->execute(array(
+            $month,
+            $version,
+            $id,
+        ));
+        return true;
+    }
+
+    /**
+     * delete a timeline entry
+     *
+     * @param Integer $id
+     * @return boolean
+     */
+    public function deleteTimeline($id){
+        $stmt = $this->db->prepare('delete from `*PREFIX*ledger_booking` WHERE `id` = ?');
+        $stmt->execute(array(
+            $id,
+        ));
+        return true;
     }
 
 }

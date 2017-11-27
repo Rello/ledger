@@ -82,39 +82,47 @@
 }
 
 .transactions-row,
-.transactions-header
+.transactions-header,
+.transactions-input
 {
 	display: table-row;
 	height: 30px;
 }
 
 .transactions-row .date,
-.transactions-header .date
+.transactions-header .date,
+.transactions-input .date
 {
 	display: table-cell;
 	width:50px;
 }
 .transactions-row .type,
-.transactions-header .type
+.transactions-header .type,
+.transactions-input .type
 {
 	display: table-cell;
 	width:100px;
 }
 .transactions-row .value,
-.transactions-header .value
+.transactions-header .value,
+.transactions-input .value
 {
 	display: table-cell;
 	text-align: center;
 	width:100px;
 }
 .transactions-row .member,
-.transactions-header .member
+.transactions-header .member,
+.transactions-input .member
 {
 	display: table-cell;
 	width:100px;
 }
 .transactions-row .note,
-.transactions-header .note
+.transactions-header .note,
+.transactions-header .month,
+.transactions-input .month,
+.transactions-input .note
 {
 	display: table-cell;
 	width:100px;
